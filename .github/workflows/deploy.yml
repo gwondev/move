@@ -30,9 +30,15 @@ jobs:
             cd backend
             chmod +x ./gradlew
             ./gradlew clean bootJar -x test
-            ls -la build/libs/  # JAR 확인
+            ls -la build/libs/  # JAR 제대로 생성됐는지 확인
             cp build/libs/*.jar ../backend.jar
             cd ..
 
-            # 4. 서비스 전부 실행 (프론트 포함)
+            # 4. frontend 빌드 (dist 생성 → Caddy 서빙)
+            cd frontend
+            npm install
+            npm run build
+            cd ..
+
+            # 5. backend + db 컨테이너만 실행한다. (프론트엔드는 Caddy가 알아서 서빙)
             docker compose up -d --build
