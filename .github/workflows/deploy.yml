@@ -1,0 +1,9 @@
+name : Move Deploy to Gwon Server
+
+on:
+  push:
+    branches:
+      - main  # main 브랜치에 푸시될 때마다 워크플로우 실행
+
+
+jobs:

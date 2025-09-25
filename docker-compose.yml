@@ -1,0 +1,51 @@
+services:
+  caddy:
+    image: caddy:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+
+  backend:
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    build: ./backend
+    depends_on:
+      - db  # MySQL이 먼저 시작되도록
+    environment:
+      - DB_HOST=db
+      - MQTT_BROKER=tcp://mosquitto:1883
+
+  frontend:
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    build: ./frontend
+
+  db:
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: movedb
+      MYSQL_USER: move
+      MYSQL_DATABASE: movedb
+      MYSQL_PASSWORD: move
+    volumes:
+      - db_data:/var/lib/mysql # ✅ 들여쓰기 맞게 수정
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+  db_data:
