@@ -40,5 +40,5 @@ jobs:
             npm run build
             cd ..
 
-            # 5. backend + db 컨테이너만 실행한다. (프론트엔드는 Caddy가 알아서 서빙,...)
+            # 5. backend + db 컨테이너만 실행한다. (프론트엔드는 Caddy가 알아서 서빙,..)
             docker compose up -d --build
