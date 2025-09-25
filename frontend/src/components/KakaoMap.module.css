@@ -1,0 +1,11 @@
+/*
+  카카오 지도 컨테이너
+  - 전체 뷰포트를 덮도록 고정 크기를 부여합니다.
+*/
+.mapContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}

@@ -1,0 +1,220 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+
+.wrap {
+  position: relative;
+  /* 반응형 너비/높이: 최소 320, 최대 600, 뷰포트에 비례 */
+  width: clamp(320px, 80vw, 600px);
+  min-height: clamp(240px, 30vh, 360px);
+  border-radius: 24px;
+  box-shadow: 10px 10px 4px rgba(0, 0, 0, 0.25);
+}
+
+.card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  min-height: 100%;
+  border-radius: 24px;
+  background: #FFFFFF; /* Colors-Neutral-100 */
+  /* padding: clamp(20px, 6vw, 64px) */
+  padding: clamp(20px, 6vw, 64px);
+  box-shadow:
+    0px 3px 12px -2px rgba(170, 170, 190, 0.06),
+    0px 4px 32px -4px rgba(111, 108, 143, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  /* gap: clamp(16px, 5vw, 80px) */
+  gap: clamp(16px, 5vw, 80px);
+}
+
+.content {
+  flex: 1 1 auto;
+  border-radius: 32px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  color: #4c4c4c; /* Colors-Neutral-800 */
+  font-size: clamp(1.25rem, 3.5vw, 1.875rem);
+  line-height: clamp(3rem, 4.5vw, 2.25rem);
+  font-weight: 800; /* semibold */
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.subtitle {
+  color: #4c4c4c; /* Colors-Neutral-600 */
+  font-size: clamp(0.95rem, 2.6vw, 1rem);
+  line-height: clamp(1.35rem, 3.2vw, 1.5rem);
+  font-weight: 400;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  margin-bottom: 4px;
+}
+
+.accordion {
+  width: 100%;
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.accGroup {}
+
+.accGroupOpen {}
+
+.accHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+  background: #F9FAFB;
+  color: #170F49;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.accHeader:hover {
+  background: #F3F4F6;
+}
+
+.accTitle {
+  font-weight: 600;
+  font-size: 0.975rem;
+}
+
+.chevron {
+  transition: transform 0.18s ease;
+}
+
+.accGroupOpen .chevron {
+  transform: rotate(180deg);
+}
+
+.accItems {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 1s ease;
+}
+
+.accItemsOpen {
+  max-height: 460px; /* 충분히 큰 값으로 슬라이드 효과 */
+}
+
+.accItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 10px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #170F49;
+  cursor: pointer;
+}
+
+.accItem:hover {
+  background: #F9FAFB;
+  border-color: #E5E7EB;
+}
+
+.accItemActive {
+  background: #EEF2FF;
+  border-color: #4F46E5;
+}
+
+.itemBullet {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: #CBD5E1;
+  display: inline-block;
+}
+
+.accItemActive .itemBullet {
+  background: #4F46E5;
+}
+
+.itemLabel {
+  font-size: 0.95rem;
+}
+
+.choices {
+  margin-top: 32px; /* pt-8 like spacing below text */
+  display: flex;
+  gap: clamp(8px, 2vw, 12px);
+  flex-wrap: wrap;
+}
+
+.choiceBtn {
+  min-width: 120px;
+  height: clamp(36px, 6vh, 40px);
+  padding: 0 clamp(12px, 3vw, 16px);
+  border-radius: 9999px;
+  border: 1px solid #E5E7EB;
+  background: #F9FAFB;
+  color: #170F49;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.choiceBtn:hover {
+  background: #EEF2FF;
+}
+
+.choiceActive {
+  background: #4F46E5; /* indigo-600 */
+  color: #FFFFFF;
+  border-color: #4F46E5;
+}
+
+.closeArea {
+  position: absolute;
+  right: clamp(8px, 2vw, 12px);
+  top: clamp(6px, 1.5vw, 8px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.closeCircle {
+  width: clamp(40px, 7vw, 40px); height: clamp(40px, 7vw, 40px);
+  padding: clamp(8px, 4vw, 8px);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.closeIcon {
+  width: clamp(16px, 3vw, 20px); height: clamp(16px, 5vh, 20px);
+  opacity: 0.9;
+}
+
+/* 작은 화면에서 내부 레이아웃이 너무 좌우로 넓어지지 않도록 세로 정렬 전환 */
+@media (max-width: 480px) {
+  .card { flex-direction: column; align-items: flex-start; }
+  .choices { width: 100%; }
+  .choiceBtn { flex: 1; min-width: 0; }
+}

@@ -1,0 +1,28 @@
+plugins = []
+headers = []
+redirects = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "/Users/ming/Desktop/개인프로젝트/팀빌딩6기/move-frontend/move/frontend/dist"
+publishOrigin = "ui"
+commandOrigin = "ui"
+base = "/Users/ming/Desktop/개인프로젝트/팀빌딩6기/move-frontend/move/frontend"
+command = "npm run build"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]

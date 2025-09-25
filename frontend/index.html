@@ -1,0 +1,24 @@
+<!--
+  index.html
+  - 개발 모드에서 Vite가 이 파일을 기준으로 앱을 구동합니다.
+  - main.jsx를 type="module"로 로드하여 React 앱을 마운트합니다.
+  - Roboto 웹폰트를 사전 연결/로딩합니다.
+-->
+<!doctype html>
+<html lang="ko, en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/MOVEicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Roboto 폰트 로드 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>MOVE</title>
+    <script type="module" src="/src/main.jsx"></script>
+  </head>
+  <body>
+    <!-- React가 마운트되는 루트 엘리먼트 -->
+    <div id="root"></div>
+  </body>
+</html>

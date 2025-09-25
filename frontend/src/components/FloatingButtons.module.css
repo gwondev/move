@@ -1,0 +1,49 @@
+/*
+  플로팅 버튼 컨테이너(우측 하단 고정)
+*/
+.container {
+  position: fixed;
+  /* 뷰포트 크기에 비례한 여백(모바일 세이프 영역 고려) */
+  --fb-offset-x: clamp(12px, 3vw, 24px);
+  --fb-offset-y: clamp(12px, 3vh, 24px);
+  right: calc(env(safe-area-inset-right, 0px) + var(--fb-offset-x));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--fb-offset-y));
+  z-index: 40;
+  display: flex;
+  /* 하단에 가로로 일정 간격으로 배치 */
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 2vw, 20px);
+}
+
+/* 공통 원형 버튼 스타일 */
+.circleBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  background: #F1F2F9;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.circleBtn:active {
+  transform: scale(0.98);
+}
+
+/* 버튼 내부 라벨 글자 */
+.label {
+  color: #4C4C4C; /* neutral-600 */
+  font-size: 1.5rem; /* text-lg */
+  user-select: none;
+}
+
+/* 아이콘 이미지 공통 크기 */
+.icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
