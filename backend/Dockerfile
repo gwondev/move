@@ -1,8 +1,10 @@
+FROM eclipse-temurin:21 AS build
+WORKDIR /app
+COPY . .
+RUN ./gradlew clean bootJar -x test
+
 FROM eclipse-temurin:21
 WORKDIR /app
-
-# GitHub Actions에서 만든 JAR을 COPY
-COPY backend.jar app.jar
-
+COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
