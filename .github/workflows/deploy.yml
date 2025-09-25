@@ -1,9 +1,38 @@
-name : Move Deploy to Gwon Server
+name: Deploy MOVE
 
 on:
   push:
     branches:
-      - main  # main 브랜치에 푸시될 때마다 워크플로우 실행
-
+      - main
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH 접속 및 move 프로젝트 배포
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          port: 22
+          host: ${{ secrets.SERVER_HOST }}
+          key: ${{ secrets.SERVER_KEY }}
+          username: ${{ secrets.SERVER_USER }}
+          script: |
+            # 1. 최신 코드 강제 반영 (move 프로젝트)
+            cd move
+            git fetch --all
+            git reset --hard origin/main
+            git clean -fdx   # 추적 안되는 파일/폴더 제거
+
+            # 2. 기존 컨테이너 종료 (볼륨 보존)
+            docker compose down --remove-orphans
+
+            # 3. backend JAR 강제 새 빌드
+            cd backend
+            chmod +x ./gradlew
+            ./gradlew clean bootJar -x test
+            ls -la build/libs/  # JAR 확인
+            cp build/libs/*.jar ../backend.jar
+            cd ..
+
+            # 4. 서비스 전부 실행 (프론트 포함)
+            docker compose up -d --build
