@@ -42,8 +42,7 @@ const MapContainer = ({ busData, num }) => {
       }
 
       // SockJS endpoint - TODO: 추후 도메인으로 변경 예정 env 추가 
-      // 배포 1차 테스트 env 미사용하고 엔드포인트 하드코딩
-      const socket = new SockJS("https://move.io.kr/ws");
+      const socket = new SockJS(wsEndpoint);
 
       // STOMP client
       const client = new Client({
@@ -52,48 +51,26 @@ const MapContainer = ({ busData, num }) => {
       });
 
       client.onConnect = () => {
-        console.log("✅ Connected to  WebSocket server");
+        console.log("✅ Connected to WebSocket server");
 
-        // 0~10번 구독 (데이터 병합 로직 적용)
-        for (let sensorNum = 0; sensorNum <= 10; sensorNum++) {
-          client.subscribe(`/move/gps/operator/${sensorNum}`, (message) => {
-            try {
-              const body = JSON.parse(message.body);
-              console.log(`📡 Received data from sensor ${sensorNum}:`, body);
-              
-              const list = Array.isArray(body) ? body : [body];
-              setData((prev) => {
-                // 기존 데이터를 Map으로 변환 (ID 기준)
-                const prevMap = new Map(prev.map(item => [item.id, item]));
-                
-                // 새 데이터 처리 및 병합
-                list.filter(Boolean).forEach(newItem => {
-                  const normalizedItem = {
-                    id: `sensor-${sensorNum}`, // 센서 번호를 고정 ID로 사용
-                    lat: Number(newItem.lat),
-                    lng: Number(newItem.lng),
-                    name: `센서 ${sensorNum}번 (${newItem.operator || 'Unknown'}/${newItem.operatorId || 0})`,
-                    speed: Number(newItem.speed || 0),
-                    updatedAt: Date.now(),
-                    operator: newItem.operator,
-                    operatorId: newItem.operatorId,
-                    heading: newItem.heading,
-                    sensorNum: sensorNum // 나중에 필터링할 때 사용
-                  };
-                  // 해당 센서의 데이터를 업데이트
-                  prevMap.set(normalizedItem.id, normalizedItem);
-                });
-                
-                // Map을 배열로 변환하여 반환
-                const result = Array.from(prevMap.values());
-                return result.length ? result : [getDefaultBus()];
-              });
-            } catch (error) {
-              console.error(`버스 데이터 파싱 실패 (센서 ${sensorNum}):`, error);
-            }
-          });
-        }
+        // 구독 - TODO: 토픽 변경 예정 env 추가
+        client.subscribe(`/move/gps/gwon/0`, (message) => {
+          try {
+            const body = JSON.parse(message.body);
+            console.log("📡 Received data:", body); // 개발자 도구에 출력
+            const list = Array.isArray(body) ? body : [body];
+            setData((prev) => {
+              const next = list.filter(Boolean);
+              if (next.length) return next;
+              if (prev?.length) return prev;
+              return [getDefaultBus()];
+            });
+          } catch (error) {
+            console.error('버스 데이터 파싱 실패', error);
+          }
+        });
       };
+
       client.onStompError = (frame) => {
         console.error("❌ STOMP error:", frame);
       };
