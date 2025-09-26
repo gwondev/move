@@ -55,6 +55,7 @@ const MapContainer = ({ busData, num }) => {
 
         // 구독 - TODO: 토픽 변경 예정 env 추가
         // 일단 1번 모듈 수신 하드코딩
+        // 다시 0번으로 변경... 웹 소켓 연결까지는 되는 것 같은데 데이터가 안 받아와짐 . 살려주셈 .
         client.subscribe(`/move/gps/operator/0`, (message) => {
           try {
             const body = JSON.parse(message.body);
