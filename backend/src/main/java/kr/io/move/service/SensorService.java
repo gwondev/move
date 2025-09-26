@@ -53,6 +53,10 @@ public class SensorService {
             // WebSocket 전송
             gpsController.sendGps(String.valueOf(dto.getId()), dto);
 
+            // 로그 확인용
+            System.out.println("📤 WebSocket Broadcast to /move/gps/operator/" 
+            + dto.getId() + " : " + dto);
+
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("MQTT 메시지 처리 중 오류: " + e.getMessage());
