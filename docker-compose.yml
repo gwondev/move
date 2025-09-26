@@ -3,7 +3,7 @@ services:
     restart: unless-stopped
     build: ./backend
     ports:
-      - "8081:8080"  # 호스트 포트 바인딩 추가
+      - "8080"   # ✅ 내부 포트만 열면 됨 (호스트 바인딩 불필요)
     depends_on:
       - db
     environment:
@@ -11,6 +11,8 @@ services:
       - DB_NAME=move
       - DB_USER=move
       - DB_PASSWORD=move
+    networks:
+      - move_default
 
   db:
     restart: unless-stopped
@@ -21,9 +23,15 @@ services:
       MYSQL_USER: move
       MYSQL_PASSWORD: move
     ports:
-      - "3307:3306"   # ✅ Caddy나 backend에서만 접근 가능 (외부 노출 불필요)
+      - "3307:3306"   # 로컬에서 직접 접속할 때만 필요
     volumes:
       - move_db_data:/var/lib/mysql
+    networks:
+      - move_default
 
 volumes:
   move_db_data:
+
+networks:
+  move_default:
+    external: true
