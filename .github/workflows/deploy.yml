@@ -36,15 +36,15 @@ jobs:
 
             # 4. frontend 빌드 준비 (.env.production 생성)
             cd frontend
-            cat > .env.production <<EOL
-            VITE_WS_URL=wss://move.io.kr/ws
-            VITE_IO_URL=https://move.io.kr/backend
-            VITE_STOMP_URL=wss://move.io.kr/ws
-            VITE_STOMP_USER=guest
-            VITE_STOMP_PASS=guest
-            VITE_KAKAO_MAP_APP_KEY=${{ secrets.VITE_KAKAO_MAP_APP_KEY }}
-            VITE_GPS_TOPIC=/topic/gps
-            EOL
+            cat > .env.production <<'EOL'
+VITE_WS_URL=https://move.io.kr/ws
+VITE_IO_URL=https://move.io.kr/backend
+VITE_STOMP_URL=wss://move.io.kr/ws
+VITE_STOMP_USER=guest
+VITE_STOMP_PASS=guest
+VITE_KAKAO_MAP_APP_KEY=${{ secrets.VITE_KAKAO_MAP_APP_KEY }}
+VITE_GPS_TOPIC=/topic/gps
+EOL
 
             # 5. frontend 빌드 (dist 생성 → Caddy 서빙)
             npm install
