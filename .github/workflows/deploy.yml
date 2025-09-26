@@ -52,4 +52,5 @@ jobs:
             cd ..
 
             # 6. backend + db 컨테이너 실행 (프론트는 Caddy에서 서빙)
+            docker compose down
             docker compose up -d --build
