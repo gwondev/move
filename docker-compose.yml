@@ -2,8 +2,8 @@ services:
   backend:
     restart: unless-stopped
     build: ./backend
-    ports:
-      - "8080"
+    expose:
+      - "8080"   # ✅ 외부 공개 필요 없음, 네트워크 내부에서만 사용
     depends_on:
       - db
     environment:
@@ -14,14 +14,14 @@ services:
 
   db:
     restart: unless-stopped
-    ports:
-      - "3306"
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: move
       MYSQL_DATABASE: move
       MYSQL_USER: move
       MYSQL_PASSWORD: move
+    expose:
+      - "3306"   # ✅ Caddy나 backend에서만 접근 가능 (외부 노출 불필요)
     volumes:
       - move_db_data:/var/lib/mysql
 
