@@ -42,7 +42,8 @@ const MapContainer = ({ busData, num }) => {
       }
 
       // SockJS endpoint - TODO: 추후 도메인으로 변경 예정 env 추가 
-      const socket = new SockJS(wsEndpoint);
+      // 배포 1차 테스트 env 미사용하고 엔드포인트 하드코딩
+      const socket = new SockJS("https://move.io.kr/ws");
 
       // STOMP client
       const client = new Client({
