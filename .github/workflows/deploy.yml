@@ -56,7 +56,7 @@ jobs:
             docker compose up -d --build
 
             # 7. Caddy Update.....
-            cd ./gwon
+            cd ../gwon
             docker compose down
             docker compose up -d 
 

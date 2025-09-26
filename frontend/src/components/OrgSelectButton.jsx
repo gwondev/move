@@ -12,7 +12,7 @@ const OrgSelectButton = ({ onToggle }) => {
           <div className={styles.pill}>
             <div className={styles.inner}>
               <img src="/checkbox.svg" alt="checkbox" className={styles.icon} />
-              <div className={styles.label}>기관 선택1</div>
+              <div className={styles.label}>기관 선택</div>
             </div>
           </div>
         </div>
