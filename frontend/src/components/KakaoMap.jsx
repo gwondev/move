@@ -54,14 +54,15 @@ const MapContainer = ({ busData, num }) => {
         console.log("✅ Connected to WebSocket server");
 
         // 구독 - TODO: 토픽 변경 예정 env 추가
-        client.subscribe(`/move/gps/gwon/0`, (message) => {
+        // 0번 모듈 수신 하드코딩
+        client.subscribe(`/move/gps/operator/0`, (message) => {
           try {
             const body = JSON.parse(message.body);
             console.log("📡 Received data:", body); // 개발자 도구에 출력
             const list = Array.isArray(body) ? body : [body];
             setData((prev) => {
               const next = list.filter(Boolean);
-              if (next.length) return next;
+              if (next.length) return next;g
               if (prev?.length) return prev;
               return [getDefaultBus()];
             });
