@@ -43,7 +43,6 @@ jobs:
             VITE_STOMP_USER=guest
             VITE_STOMP_PASS=guest
             VITE_KAKAO_MAP_APP_KEY=${{ secrets.VITE_KAKAO_MAP_APP_KEY }}
-            VITE_GPS_TOPIC=/move/gps/operator/1
             EOL
 
             # 5. frontend 빌드 (dist 생성 → Caddy 서빙)
@@ -60,5 +59,5 @@ jobs:
             docker compose down
             docker compose up -d 
 
-            # 8. 배포 완료
+            # 8. 배포 완료.
             

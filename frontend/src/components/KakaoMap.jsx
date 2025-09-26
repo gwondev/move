@@ -51,7 +51,7 @@ const MapContainer = ({ busData, num }) => {
       });
 
       client.onConnect = () => {
-        console.log("✅ Connected to WebSocket server");
+        console.log("✅ Connected to  WebSocket server");
 
         // 0~10번 구독 (데이터 병합 로직 적용)
         for (let sensorNum = 0; sensorNum <= 10; sensorNum++) {
