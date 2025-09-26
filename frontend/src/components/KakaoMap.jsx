@@ -55,7 +55,7 @@ const MapContainer = ({ busData, num }) => {
 
         // 구독 - TODO: 토픽 변경 예정 env 추가
         // 0번 모듈 수신 하드코딩
-        client.subscribe(`/move/gps/operator/0`, (message) => {
+        client.subscribe(`/move/gps/operator/1`, (message) => {
           try {
             const body = JSON.parse(message.body);
             console.log("📡 Received data:", body); // 개발자 도구에 출력
