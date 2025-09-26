@@ -2,7 +2,7 @@
   index.css (전역 스타일 엔트리)
   - TailwindCSS 초기화 및 유틸리티 로드
   - 동적으로 생성되는 Kakao CustomOverlay 스타일 로드(overlays.css)
-  - 템플릿에서 내려오는 전역 버튼 스타일을 제거하여 컴포넌트 모듈과 충돌을 방지
+  - 템플릿에서 내려오는 전역 버튼 스타일을 제거하여 컴포넌트 모듈과 충돌을 방지.
 */
 @import "tailwindcss";
 @import "./styles/overlays.css";
