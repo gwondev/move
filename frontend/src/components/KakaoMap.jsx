@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from './KakaoMap.module.css';
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
+import updateBusMarkers, { FALLBACK_ORG, stopAllAnimations } from './map/busMarkerManager'
 
 const INITIAL_POSITION = { lat: 35.140876, lng: 126.930593 };
 const getDefaultBus = () => ({
@@ -13,9 +14,10 @@ const getDefaultBus = () => ({
   name: '임시 운행 버스',
   speed: 0,
   updatedAt: Date.now(),
+  org: FALLBACK_ORG,
 });
 
-const MapContainer = ({ busData, num }) => {
+const MapContainer = ({ busData, num, selectedOrg }) => {
     const mapContainer = useRef(null);
     const map = useRef(null);
     const [data, setData] = useState([getDefaultBus()]);
@@ -23,9 +25,11 @@ const MapContainer = ({ busData, num }) => {
     const busMarkersRef = useRef(new Map());
     const busMarkerImageRef = useRef(null);
     const busOverlaysRef = useRef(new Map());
+    const busMetaRef = useRef(new Map());
 
     useEffect(() => {
       const rawWsUrl = import.meta.env.VITE_WS_URL || '';
+      const gpsTopic = import.meta.env.VITE_GPS_TOPIC || '/move/gps/operator/1';
       const wsEndpoint = (() => {
         if (!rawWsUrl) return '';
         if (typeof window === 'undefined') return rawWsUrl;
@@ -41,6 +45,8 @@ const MapContainer = ({ busData, num }) => {
         return () => undefined;
       }
 
+      console.log('🌐 Using SockJS endpoint:', wsEndpoint);
+
       // SockJS endpoint - TODO: 추후 도메인으로 변경 예정 env 추가 
       const socket = new SockJS(wsEndpoint);
 
@@ -52,18 +58,16 @@ const MapContainer = ({ busData, num }) => {
 
       client.onConnect = () => {
         console.log("✅ Connected to WebSocket server");
+        console.log('📌 Subscribing to topic:', gpsTopic);
 
-        // 구독 - TODO: 토픽 변경 예정 env 추가
-        // 일단 1번 모듈 수신 하드코딩
-        // 다시 0번으로 변경... 웹 소켓 연결까지는 되는 것 같은데 데이터가 안 받아와짐 . 살려주셈 .
-        client.subscribe(`/move/gps/operator/0`, (message) => {
+        client.subscribe(gpsTopic, (message) => {
           try {
             const body = JSON.parse(message.body);
             console.log("📡 Received data:", body); // 개발자 도구에 출력
             const list = Array.isArray(body) ? body : [body];
             setData((prev) => {
               const next = list.filter(Boolean);
-              if (next.length) return next;g
+              if (next.length) return next;
               if (prev?.length) return prev;
               return [getDefaultBus()];
             });
@@ -75,6 +79,9 @@ const MapContainer = ({ busData, num }) => {
 
       client.onStompError = (frame) => {
         console.error("❌ STOMP error:", frame);
+      };
+      client.onWebSocketClose = (evt) => {
+        console.warn('⚠️ SockJS connection closed', evt);
       };
 
       client.activate();
@@ -309,146 +316,58 @@ const MapContainer = ({ busData, num }) => {
 
     useEffect(() => {
       if (!mapReady || !map.current) return;
+      updateBusMarkers({
+        map: map.current,
+        data,
+        markerImage: busMarkerImageRef.current ?? undefined,
+        markersRef: busMarkersRef,
+        overlaysRef: busOverlaysRef,
+        metaRef: busMetaRef,
+        selectedOrg,
+      });
+    }, [data, mapReady, selectedOrg]);
 
-      const normalizeItem = (item) => {
-        if (!item) return null;
-        const lat = Number(item.lat ?? item.latitude ?? item.latY ?? item.latValue ?? item?.gps?.lat ?? item?.gps?.latitude);
-        const lng = Number(item.lng ?? item.longitude ?? item.lon ?? item.long ?? item?.gps?.lng ?? item?.gps?.longitude);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-        const id = String(item.id ?? item.busId ?? item.vehicleId ?? item.plateNumber ?? `${lat}-${lng}`);
-        const name = item.name ?? item.routeName ?? item.label ?? item.title ?? item.busName ?? item.plateNumber ?? '운행 차량';
-        const speedValue = Number(item.speed ?? item.velocity ?? item.speedKm ?? item.kmh ?? item?.telemetry?.speed);
-        const updatedRaw = item.updatedAt ?? item.timestamp ?? item.lastUpdated ?? item.time ?? item?.telemetry?.timestamp;
-        const updatedAt = typeof updatedRaw === 'number'
-          ? updatedRaw
-          : (typeof updatedRaw === 'string' ? Date.parse(updatedRaw) : undefined);
-        return {
-          id,
-          lat,
-          lng,
-          name,
-          speed: Number.isFinite(speedValue) ? speedValue : undefined,
-          updatedAt: Number.isFinite(updatedAt) ? updatedAt : Date.now(),
-        };
-      };
+    useEffect(() => {
+      if (!mapReady || !map.current) return;
+      if (selectedOrg !== FALLBACK_ORG) return;
 
-      const markers = busMarkersRef.current;
-      const seen = new Set();
-
-      data.forEach((raw) => {
-        const item = normalizeItem(raw);
-        if (!item) return;
-
-        const key = item.id;
-        seen.add(key);
-        const position = new window.kakao.maps.LatLng(item.lat, item.lng);
-
-        let marker = markers.get(key);
-        if (!marker) {
-          marker = new window.kakao.maps.Marker({
-            position,
-            map: map.current,
-            image: busMarkerImageRef.current ?? undefined,
-            zIndex: 5,
-            title: item.name,
-          });
-
-          if (item.name) {
-            const infowindow = new window.kakao.maps.InfoWindow({
-              content: `<div style="padding:6px 10px;font-size:12px;color:#111827;">${item.name}</div>`,
-            });
-            window.kakao.maps.event.addListener(marker, 'mouseover', () => {
-              infowindow.open(map.current, marker);
-            });
-            window.kakao.maps.event.addListener(marker, 'mouseout', () => {
-              infowindow.close();
-            });
-          }
-
-          const overlay = createOrUpdateBusOverlay(item, position, map.current);
-          busOverlaysRef.current.set(key, overlay);
-          markers.set(key, marker);
-        } else {
-          marker.setPosition(position);
-          const overlay = createOrUpdateBusOverlay(item, position, map.current, busOverlaysRef.current.get(key));
-          if (overlay) busOverlaysRef.current.set(key, overlay);
+      const meta = busMetaRef.current;
+      let target = null;
+      for (const value of meta.values()) {
+        if (value?.org === FALLBACK_ORG) {
+          target = value;
+          break;
         }
-      });
+      }
+      if (!target && meta.size) {
+        target = meta.values().next().value;
+      }
+      if (!target) return;
 
-      markers.forEach((marker, key) => {
-        if (seen.has(key)) return;
-        marker.setMap(null);
-        markers.delete(key);
-        const overlay = busOverlaysRef.current.get(key);
-        if (overlay) overlay.setMap(null);
-        busOverlaysRef.current.delete(key);
-      });
-    }, [data, mapReady]);
+      const marker = busMarkersRef.current.get(target.id);
+      if (!marker) return;
+      const pos = marker.getPosition?.();
+      if (!pos) return;
+
+      try {
+        map.current.setCenter(pos);
+      } catch (error) {
+        console.warn('지도 중심 이동 실패', error);
+      }
+    }, [selectedOrg, data, mapReady]);
 
     useEffect(() => () => {
       busMarkersRef.current.forEach((marker) => marker.setMap(null));
       busMarkersRef.current.clear();
       busOverlaysRef.current.forEach((overlay) => overlay.setMap(null));
       busOverlaysRef.current.clear();
+      busMetaRef.current.clear();
+      stopAllAnimations();
     }, []);
 
     return (
         <div ref={mapContainer} className={styles.mapContainer}></div>
   );
-};
-
-const createOrUpdateBusOverlay = (item, position, mapInstance, existingOverlay) => {
-  if (!window.kakao?.maps) return existingOverlay ?? null;
-
-  const { speed, updatedAt } = item;
-  const speedText = Number.isFinite(speed) ? `${Math.round(speed)} km/h` : '속도 정보 없음';
-  const updatedText = (() => {
-    if (!Number.isFinite(updatedAt)) return '업데이트 정보 없음';
-    const diffSec = Math.max(0, Math.round((Date.now() - updatedAt) / 1000));
-    if (diffSec < 1) return '방금 업데이트';
-    if (diffSec < 60) return `${diffSec}s 전 업데이트`;
-    const diffMin = Math.round(diffSec / 60);
-    if (diffMin < 60) return `${diffMin}m 전 업데이트`;
-    const diffHour = Math.round(diffMin / 60);
-    return `${diffHour}h 전 업데이트`;
-  })();
-
-  const getContent = (overlay) => {
-    if (overlay) return overlay.getContent();
-    const container = document.createElement('div');
-    container.className = 'busOverlay';
-    container.innerHTML = `
-      <div class="busOverlayInner">
-        <div class="busOverlaySpeed">${speedText}</div>
-        <div class="busOverlayMeta">${updatedText}</div>
-      </div>
-    `;
-    return container;
-  };
-
-  const content = getContent(existingOverlay);
-  if (content?.querySelector) {
-    const speedEl = content.querySelector('.busOverlaySpeed');
-    const metaEl = content.querySelector('.busOverlayMeta');
-    if (speedEl) speedEl.textContent = speedText;
-    if (metaEl) metaEl.textContent = updatedText;
-  }
-
-  if (existingOverlay) {
-    existingOverlay.setPosition(position);
-    existingOverlay.setContent(content);
-    return existingOverlay;
-  }
-
-  const overlay = new window.kakao.maps.CustomOverlay({
-    position,
-    content,
-    xAnchor: 0.5,
-    yAnchor: 1.6,
-    zIndex: 6,
-  });
-  overlay.setMap(mapInstance ?? window.__kakaoMap ?? null);
-  return overlay;
 };
 
 export default MapContainer;

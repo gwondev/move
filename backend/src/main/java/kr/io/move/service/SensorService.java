@@ -25,7 +25,7 @@ public class SensorService {
 
             // DTO → Entity 변환
             SensorEntity entity = new SensorEntity();
-            entity.setOperator(dto.getOperator());
+            entity.setOperator(dto.getOperatorName());
             entity.setOperatorId(dto.getOperatorId());
             entity.setDriveStatus(dto.getDriveStatus());
             entity.setGpsCount(dto.getGpsCount());
@@ -54,8 +54,8 @@ public class SensorService {
             gpsController.sendGps(String.valueOf(dto.getId()), dto);
 
             // 로그 확인용
-            System.out.println("📤 WebSocket Broadcast to /move/gps/operator/" 
-            + dto.getId() + " : " + dto);
+            System.out.println("📤 WebSocket Broadcast to /move/gps"
+                    + dto.getId() + " : " + dto);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 @Setter
 public class SensorDataDto {
     private Long id;
-    private String operator;
+    private String operatorName;
     private Long operatorId;
     private String driveStatus;
     private Integer gpsCount;

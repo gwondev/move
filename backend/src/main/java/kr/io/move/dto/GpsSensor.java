@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 // 센서로부터 받아올 데이터들
 public class GpsSensor {
     private Long id;
-    private String operator;
+    private String operatorName;
     private Long operatorId;
     private String driveStatus;
     private Integer gpsCount;

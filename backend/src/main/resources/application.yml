@@ -1,16 +1,16 @@
 spring:
   datasource:
-    url: jdbc:mysql://db:3306/move?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
-    username: move
-    password: move
+    url: jdbc:mysql://localhost:3306/move_db?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: pwd1234
     driver-class-name: com.mysql.cj.jdbc.Driver
-
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+

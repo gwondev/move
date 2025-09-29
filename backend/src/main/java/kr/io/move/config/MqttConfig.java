@@ -12,7 +12,7 @@ import org.springframework.messaging.MessageChannel;
 @Configuration
 public class MqttConfig {
     private final String brokerUrl = "tcp://gwon.my:1883";
-    private final String clientId = "spring-boot-subscriber";
+    private final String clientId = "spring-boot-subscribe";
     private final String topic = "move/gps/#";
 
     @Bean

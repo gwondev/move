@@ -17,7 +17,7 @@ public class GpsController {
      */
     public void sendGps(String num, GpsSensor message) {
         messagingTemplate.convertAndSend(
-                "/move/gps/operator/" + num,
+                "/move/gps",
                 message
         );
     }

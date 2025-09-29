@@ -93,7 +93,7 @@ function App() {
   // 단순 배치만 담당하며, 로직은 각 컴포넌트 내부에 캡슐화되어 있습니다.
   return (
     <>
-      <KakaoMap />
+      <KakaoMap selectedOrg={org} />
       <SearchBox />
       <FloatingButtons />
       <OrgSelectButton onToggle={() => setShowModal(v => !v)} />
