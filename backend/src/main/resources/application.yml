@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/move_db?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: pwd1234
+    url: jdbc:mysql://db:3306/move?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+    username: move
+    password: move
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
