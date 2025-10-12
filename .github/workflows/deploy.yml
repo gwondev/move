@@ -46,19 +46,13 @@ jobs:
             VITE_KAKAO_MAP_APP_KEY=${{ secrets.VITE_KAKAO_MAP_APP_KEY }}
             EOL
 
-            # 5. frontend 빌드 (dist 생성 → Caddy 서빙)
+            # frontend 빌드 (dist 생성 → Caddy 서빙)
             npm install
             npm run build
             cd ..
 
-            # 6. backend + db 컨테이너 실행 (프론트는 Caddy에서 서빙)
-            docker compose down
+            # 서비스 전부 실행
             docker compose up -d --build
-
-            # 7. Caddy Update.....
-            cd ../gwon
-            docker compose down
-            docker compose up -d 
 
             # Caddy가 move 프로젝트를 인식하도록 네트워크 연결
             docker network connect move_default gwon-caddy-1 || true
