@@ -60,5 +60,8 @@ jobs:
             docker compose down
             docker compose up -d 
 
-            # 8. 배포 완료
+            # Caddy가 move 프로젝트를 인식하도록 네트워크 연결
+            docker network connect move_default gwon-caddy-1 || true
+
+
             
