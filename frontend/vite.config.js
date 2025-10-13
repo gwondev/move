@@ -13,7 +13,7 @@ export default defineConfig({
   },
   server: {
     // 네트워크 상 다른 기기에서 접속 가능하도록 0.0.0.0 바인딩
-    host: true,
+    host: '0.0.0.0',  // ✅
     port: 5173,      // 기본 개발 서버 포트
     strictPort: true // 사용 중이면 에러로 종료
   }
