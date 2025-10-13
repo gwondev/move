@@ -34,9 +34,9 @@ jobs:
             cp build/libs/*.jar ../backend.jar
             cd ..
 
-            # 4. frontend 빌드 준비 (.env.production 생성)
+            # 4. frontend 빌드 준비 
             cd frontend
-            cat > .env.production <<'EOL'
+            cat > .env <<'EOL'
             VITE_WS_URL=https://move.io.kr/ws
             VITE_IO_URL=https://move.io.kr/backend
             VITE_STOMP_URL=https://move.io.kr/ws
