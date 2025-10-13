@@ -42,7 +42,7 @@ jobs:
             VITE_STOMP_URL=https://move.io.kr/ws
             VITE_STOMP_USER=guest
             VITE_STOMP_PASS=guest
-            VITE_GPS_TOPIC=/topic/gps
+            VITE_GPS_TOPIC=/move/gps
             VITE_KAKAO_MAP_APP_KEY=${{ secrets.VITE_KAKAO_MAP_APP_KEY }}
             EOL
 
