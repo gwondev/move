@@ -266,6 +266,12 @@ const MapContainer = ({ busData, num, selectedOrg }) => {
       //여기까지 CreateOrUpdateMyLocation 함수
 
       // 마커 보간 애니메이션 함수 실험적 추가
+      // Easing 함수 추가 (ease-in-out)
+      function easeInOutQuad(t) {
+        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      }
+
+      // 마커 보간 애니메이션 함수 수정
       function animateMarkerMove(marker, newLat, newLng, duration = 1000) {
         const startPos = marker.getPosition();
         const startLat = startPos.getLat();
@@ -278,8 +284,9 @@ const MapContainer = ({ busData, num, selectedOrg }) => {
           if (!startTime) startTime = timestamp;
           const progress = (timestamp - startTime) / duration;
           const t = Math.min(progress, 1);
-          const currentLat = startLat + deltaLat * t;
-          const currentLng = startLng + deltaLng * t;
+          const easedT = easeInOutQuad(t); // Easing 적용
+          const currentLat = startLat + deltaLat * easedT;
+          const currentLng = startLng + deltaLng * easedT;
           marker.setPosition(new window.kakao.maps.LatLng(currentLat, currentLng));
           if (t < 1) requestAnimationFrame(step);
         }
