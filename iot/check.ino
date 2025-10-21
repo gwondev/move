@@ -8,7 +8,7 @@ void powerOn() {
   digitalWrite(PWRKEY, LOW); delay(100);
 }
 
-// ---- attach 대기 ----
+// ---- attach 대기 -----
 bool waitAttach(uint32_t ms) {
   unsigned long t = millis();
   while (millis() - t < ms) {
