@@ -17,7 +17,13 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           username: ${{ secrets.SERVER_USER }}
           script: |
-            # 1. 최신 코드 강제 반영 (move 프로젝트)
+            # 1. 프로젝트 폴더 확인 및 클론
+            if [ ! -d "move" ]; then
+              echo "move 프로젝트 폴더가 없습니다. 클론을 시작합니다..."
+              git clone https://github.com/gwondev/move.git
+            fi
+
+            # 2. 최신 코드 강제 반영 (move 프로젝트)
             cd move
             git fetch --all
             git reset --hard origin/main
