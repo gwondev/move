@@ -1,5 +1,6 @@
 services:
   frontend:
+    container_name: move-frontend
     restart: unless-stopped
     build: ./frontend
     ports:
@@ -8,6 +9,7 @@ services:
       - global_network
 
   backend:
+    container_name: move-backend
     restart: unless-stopped
     build: ./backend
     networks:
@@ -20,6 +22,7 @@ services:
 
 
   db:
+    container_name: move-db
     restart: unless-stopped
     image: mysql:latest
     environment:
