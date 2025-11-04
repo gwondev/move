@@ -4,14 +4,14 @@ services:
     build: ./frontend
     ports:
       - "5173:5173"
+    networks:
+      - global_network
 
   backend:
     restart: unless-stopped
     build: ./backend
-    ports:
-      - "8081:8080"   # ✅ 내부 포트만 열면 됨 (호스트 바인딩 불필요)
-    depends_on:
-      - db
+    networks:
+      - global_network
     environment:
       - DB_HOST=db
       - DB_NAME=move
@@ -27,12 +27,16 @@ services:
       MYSQL_DATABASE: move
       MYSQL_USER: move
       MYSQL_PASSWORD: move
-    ports:
-      - "3307:3306"   # 로컬에서 직접 접속할 때만 필요
     volumes:
       - move_db_data:/var/lib/mysql
+    networks:
+      - global_network
 
 
 volumes:
   move_db_data:
 
+# 🌍 글로벌 네트워크 (다른 프로젝트와 공유)
+networks:
+  global_network:
+    external: true
