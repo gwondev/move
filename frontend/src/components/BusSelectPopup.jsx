@@ -7,11 +7,13 @@ const DEFAULT_OPTION = { id: 'all', name: '전체보기' }
 
 const BusSelectPopup = ({ orgName, buses = [], selectedBusId = DEFAULT_OPTION.id, onSelectBus }) => {
   const [open, setOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
   const dropdownRef = useRef(null)
 
   const options = useMemo(() => {
     if (!Array.isArray(buses)) return [DEFAULT_OPTION]
-    return [DEFAULT_OPTION, ...buses]
+    const hasAll = buses.some((opt) => opt?.id === DEFAULT_OPTION.id)
+    return hasAll ? buses : [DEFAULT_OPTION, ...buses]
   }, [buses])
 
   const activeOption = useMemo(() => {
@@ -29,9 +31,19 @@ const BusSelectPopup = ({ orgName, buses = [], selectedBusId = DEFAULT_OPTION.id
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [open])
 
+  const prevSelectedRef = useRef(selectedBusId)
+
   useEffect(() => {
+    if (prevSelectedRef.current !== selectedBusId) {
+      setOpen(false)
+      prevSelectedRef.current = selectedBusId
+    }
+  }, [selectedBusId])
+
+  useEffect(() => {
+    if (!collapsed) return
     setOpen(false)
-  }, [selectedBusId, buses])
+  }, [collapsed])
 
   if (!orgName || !buses || buses.length < 2) {
     return null
@@ -42,7 +54,17 @@ const BusSelectPopup = ({ orgName, buses = [], selectedBusId = DEFAULT_OPTION.id
     setOpen(false)
   }
 
-  const rootClassName = `${styles.root} ${open ? styles.rootRaised : ''}`
+  const rootClassName = `${styles.root} ${open ? styles.rootRaised : ''} ${collapsed ? styles.rootCollapsed : ''}`
+
+  if (collapsed) {
+    return (
+      <aside className={rootClassName} aria-live="polite">
+        <button type="button" className={styles.reopenButton} onClick={() => setCollapsed(false)}>
+          <span className={styles.reopenLabel}>버스 선택하기</span>
+        </button>
+      </aside>
+    )
+  }
 
   return (
     <aside className={rootClassName} aria-live="polite">
@@ -50,6 +72,14 @@ const BusSelectPopup = ({ orgName, buses = [], selectedBusId = DEFAULT_OPTION.id
         <div className={styles.header}>
           <h2 className={styles.title}>버스 선택</h2>
           <p className={styles.subtitle}>실시간 이동 및 노선을 보고싶은 버스를 선택해주세요.</p>
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={() => setCollapsed(true)}
+            aria-label="버스 선택 닫기"
+          >
+            <img src="/searchbox/group.svg" alt="clear" className="w-4 h-4" />
+          </button>
         </div>
 
         <div className={styles.divider} />

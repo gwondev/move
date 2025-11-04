@@ -4,18 +4,37 @@
 import React, { useEffect, useState } from 'react'
 import styles from './OrgSelectModal.module.css'
 
-const OrgSelectModal = ({ open, defaultOrg, onSelect, onClose }) => {
+const OrgSelectModal = ({ open, defaultOrg, onSelect, onClose, groups }) => {
   const [selected, setSelected] = useState(defaultOrg || '')
   const [openGroups, setOpenGroups] = useState({})
 
   // 아코디언에 표시할 그룹/기관 목록 (필요 시 데이터로 대체 가능)
-  const ORG_GROUPS = [
-    { title: '선택하기', items: ['조선대학교', '복지관'] },
-  ]
+  const ORG_GROUPS = groups && groups.length
+    ? groups
+    : [{ title: '선택하기', items: ['조선대학교', '복지관'] }]
 
   useEffect(() => {
     setSelected(defaultOrg || '')
   }, [defaultOrg])
+
+  useEffect(() => {
+    if (!open) return
+    if (!ORG_GROUPS.length) return
+    setOpenGroups((prev) => {
+      const next = {}
+      let hasOpen = false
+      ORG_GROUPS.forEach((group, index) => {
+        const wasOpen = !!prev[group.title]
+        next[group.title] = wasOpen
+        if (wasOpen) hasOpen = true
+      })
+      if (!hasOpen) {
+        const first = ORG_GROUPS[0]
+        next[first.title] = true
+      }
+      return next
+    })
+  }, [open, ORG_GROUPS])
 
   if (!open) return null
 

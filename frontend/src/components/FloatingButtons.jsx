@@ -22,6 +22,18 @@ const FloatingButtons = () => {
   return (
     <div className={styles.container}>
       <CircleBtn
+        label="↺"
+        iconSrc="/mapsize/line-rounded-reset.svg"
+        iconAlt="기본 크기"
+        onClick={() => {
+          try {
+            window.__resetMapToSelection?.({ reason: 'reset-zoom', level: 3 })
+          } catch (error) {
+            console.warn('기본 크기 복원 실패', error)
+          }
+        }}
+      />
+      <CircleBtn
         label="+"
         iconSrc="/mapsize/line-rounded-plus.svg"
         iconAlt="확대"
@@ -41,6 +53,11 @@ const FloatingButtons = () => {
           if (window.__myLocationMarker && window.__kakaoMap) {
             const pos = window.__myLocationMarker.getPosition()
             window.__kakaoMap.setCenter(pos)
+            try {
+              window.__notifyManualMapInteraction?.({ reason: 'user-location', duration: Infinity })
+            } catch (error) {
+              console.warn('Manual map interaction notify failed', error)
+            }
           }
         }}
       />

@@ -25,7 +25,8 @@
   width: 100%;
   min-height: 100%;
   border-radius: 24px;
-  background: #FFFFFF; /* Colors-Neutral-100 */
+  background: #FFFFFF;
+  /* Colors-Neutral-100 */
   /* padding: clamp(20px, 6vw, 64px) */
   padding: clamp(20px, 6vw, 64px);
   box-shadow:
@@ -47,15 +48,19 @@
 }
 
 .title {
-  color: #4c4c4c; /* Colors-Neutral-800 */
+  color: #4c4c4c;
+  /* Colors-Neutral-800 */
   font-size: clamp(1.25rem, 3.5vw, 1.875rem);
   line-height: clamp(3rem, 4.5vw, 2.25rem);
-  font-weight: 800; /* semibold */
+  font-weight: 800;
+  text-align: center;
+  /* semibold */
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 .subtitle {
-  color: #4c4c4c; /* Colors-Neutral-600 */
+  color: #4c4c4c;
+  /* Colors-Neutral-600 */
   font-size: clamp(0.95rem, 2.6vw, 1rem);
   line-height: clamp(1.35rem, 3.2vw, 1.5rem);
   font-weight: 400;
@@ -117,7 +122,8 @@
 }
 
 .accItemsOpen {
-  max-height: 460px; /* 충분히 큰 값으로 슬라이드 효과 */
+  max-height: 460px;
+  /* 충분히 큰 값으로 슬라이드 효과 */
 }
 
 .accItem {
@@ -160,7 +166,8 @@
 }
 
 .choices {
-  margin-top: 32px; /* pt-8 like spacing below text */
+  margin-top: 32px;
+  /* pt-8 like spacing below text */
   display: flex;
   gap: clamp(8px, 2vw, 12px);
   flex-wrap: wrap;
@@ -183,7 +190,8 @@
 }
 
 .choiceActive {
-  background: #4F46E5; /* indigo-600 */
+  background: #4F46E5;
+  /* indigo-600 */
   color: #FFFFFF;
   border-color: #4F46E5;
 }
@@ -198,7 +206,8 @@
 }
 
 .closeCircle {
-  width: clamp(40px, 7vw, 40px); height: clamp(40px, 7vw, 40px);
+  width: clamp(40px, 7vw, 40px);
+  height: clamp(40px, 7vw, 40px);
   padding: clamp(8px, 4vw, 8px);
   border-radius: 9999px;
   display: flex;
@@ -208,13 +217,24 @@
 }
 
 .closeIcon {
-  width: clamp(16px, 3vw, 20px); height: clamp(16px, 5vh, 20px);
+  width: clamp(16px, 3vw, 20px);
+  height: clamp(16px, 5vh, 20px);
   opacity: 0.9;
 }
 
 /* 작은 화면에서 내부 레이아웃이 너무 좌우로 넓어지지 않도록 세로 정렬 전환 */
 @media (max-width: 480px) {
-  .card { flex-direction: column; align-items: flex-start; }
-  .choices { width: 100%; }
-  .choiceBtn { flex: 1; min-width: 0; }
+  .card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .choices {
+    width: 100%;
+  }
+
+  .choiceBtn {
+    flex: 1;
+    min-width: 0;
+  }
 }

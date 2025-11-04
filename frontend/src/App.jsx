@@ -7,19 +7,29 @@ import KakaoMap from './components/KakaoMap'
 import SearchBox from './components/SearchBox'
 import FloatingButtons from './components/FloatingButtons'
 import BusSelectPopup from './components/BusSelectPopup'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import OrgSelectModal from './components/OrgSelectModal'
 import OrgSelectButton from './components/OrgSelectButton'
 
 const ORG_BUSES = {
   '조선대학교': [
-    { id: 'chosun-1', name: '1호차' },
-    { id: 'chosun-2', name: '2호차' },
+    { id: 'chosun-1', name: '1호차', operatorId: 0 },
+    { id: 'chosun-2', name: '2호차', operatorId: 1 },
   ],
   '복지관': [
-    { id: 'welfare-1', name: '셔틀 A' },
+    { id: 'jang-1', name: '1호차', operatorId: 0 },
+    { id: 'jang-2', name: '2호차', operatorId: 1 },
   ],
 }
+
+const withAllOption = (map) => Object.fromEntries(
+  Object.entries(map).map(([label, list]) => [
+    label,
+    [{ id: 'all', name: '전체보기', operatorId: null }, ...(Array.isArray(list) ? list : [])],
+  ]),
+)
+
+const DEFAULT_ORG_GROUPS = [{ title: '선택하기', items: Object.keys(ORG_BUSES) }]
 
 const BUS_STORAGE_KEY = 'selectedBusByOrg'
 
@@ -28,6 +38,8 @@ function App() {
   const [org, setOrg] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [selectedBus, setSelectedBus] = useState('all')
+  const [busOptionsByOrg, setBusOptionsByOrg] = useState(() => withAllOption(ORG_BUSES))
+  const [orgGroups, setOrgGroups] = useState(DEFAULT_ORG_GROUPS)
 
   useEffect(() => {
     const saved = localStorage.getItem('selectedOrg') || ''
@@ -88,16 +100,121 @@ function App() {
     persistBusSelection(org, busId)
   }
 
-  const busOptions = useMemo(() => ORG_BUSES[org] || [], [org])
+  const busOptions = useMemo(() => busOptionsByOrg[org] || [{ id: 'all', name: '전체보기', operatorId: null }], [busOptionsByOrg, org])
+
+  const activeBusOption = useMemo(() => {
+    return busOptions.find((bus) => bus.id === selectedBus) || busOptions[0] || null
+  }, [busOptions, selectedBus])
+
+  const selectedBusFilter = activeBusOption?.operatorId ?? null
+
+  useEffect(() => {
+    if (!org) return
+    if (busOptionsByOrg[org]) return
+    const fallbackOrg = orgGroups.find((group) => Array.isArray(group.items) && group.items.length)?.items?.[0] || ''
+    if (fallbackOrg && fallbackOrg !== org) {
+      setOrg(fallbackOrg)
+      try { localStorage.setItem('selectedOrg', fallbackOrg) } catch {}
+    }
+  }, [org, busOptionsByOrg, orgGroups])
+
+  useEffect(() => {
+    const options = busOptionsByOrg[org]
+    if (!options) return
+    if (selectedBus === 'all') return
+    if (options.some((opt) => opt.id === selectedBus)) return
+    setSelectedBus('all')
+  }, [org, busOptionsByOrg, selectedBus])
+
+  const handleBusMetaUpdate = useCallback((metaList = []) => {
+    if (!Array.isArray(metaList) || !metaList.length) {
+      setBusOptionsByOrg(withAllOption(ORG_BUSES))
+      setOrgGroups(DEFAULT_ORG_GROUPS)
+      return
+    }
+
+    const devMode = import.meta.env.DEV
+    const allowedKeys = new Set(['jang', 'chosun', 'jang-test', 'chosun-test'])
+    const grouped = new Map()
+
+    metaList.forEach((item) => {
+      if (!item) return
+      const { orgKey, org: orgLabel, operatorId, id: metaId, name, operatorName } = item
+      if (!orgKey || !allowedKeys.has(orgKey)) return
+      const isTest = /test/i.test(orgKey)
+      if (isTest && !devMode) return
+
+      const displayOrg = (orgLabel || (orgKey.startsWith('chosun') ? '조선대학교' : '복지관')).trim()
+      const bucket = grouped.get(displayOrg) || { label: displayOrg, isTest, buses: [], orgKey }
+
+      const label = (name && name !== '운행 차량')
+        ? name
+        : Number.isFinite(operatorId)
+          ? `${operatorId + 1}호차`
+          : `버스 ${bucket.buses.length + 1}`
+
+      const entryId = `${metaId}`
+      if (!bucket.buses.some((opt) => opt.id === entryId)) {
+        bucket.buses.push({
+          id: entryId,
+          name: label,
+          operatorId: Number.isFinite(operatorId) ? operatorId : null,
+          operatorName,
+        })
+      }
+      bucket.isTest = isTest
+      grouped.set(displayOrg, bucket)
+    })
+
+    if (!grouped.size) {
+      setBusOptionsByOrg(withAllOption(ORG_BUSES))
+      setOrgGroups(DEFAULT_ORG_GROUPS)
+      return
+    }
+
+    const nextBusOptions = {}
+    const primaryOrgs = []
+    const testOrgs = []
+
+    grouped.forEach((bucket, label) => {
+      bucket.buses.sort((a, b) => {
+        if (a.operatorId !== null && b.operatorId !== null) return a.operatorId - b.operatorId
+        if (a.operatorId !== null) return -1
+        if (b.operatorId !== null) return 1
+        return a.name.localeCompare(b.name, 'ko')
+      })
+      bucket.buses.unshift({ id: 'all', name: '전체보기', operatorId: null })
+      nextBusOptions[label] = bucket.buses
+      if (bucket.isTest) {
+        if (devMode) testOrgs.push(label)
+      } else {
+        primaryOrgs.push(label)
+      }
+    })
+
+    primaryOrgs.sort((a, b) => a.localeCompare(b, 'ko'))
+    testOrgs.sort((a, b) => a.localeCompare(b, 'ko'))
+
+    const nextGroups = []
+    if (primaryOrgs.length) nextGroups.push({ title: '선택하기', items: primaryOrgs })
+    if (devMode && testOrgs.length) nextGroups.push({ title: '테스트', items: testOrgs })
+
+    setBusOptionsByOrg(nextBusOptions)
+    if (nextGroups.length) {
+      setOrgGroups(nextGroups)
+    } else {
+      setOrgGroups(DEFAULT_ORG_GROUPS)
+    }
+  }, [])
 
   // 단순 배치만 담당하며, 로직은 각 컴포넌트 내부에 캡슐화되어 있습니다.
   return (
     <>
-      <KakaoMap selectedOrg={org} />
+      <KakaoMap selectedOrg={org} selectedBusFilter={selectedBusFilter} onBusMetaUpdate={handleBusMetaUpdate} />
       <SearchBox />
       <FloatingButtons />
-      <OrgSelectButton onToggle={() => setShowModal(v => !v)} />
-      <OrgSelectModal open={showModal} defaultOrg={org} onSelect={handleSelect} onClose={handleClose} />
+      <OrgSelectButton currentOrg={org} onToggle={() => setShowModal(v => !v)} />
+      <OrgSelectModal open={showModal} defaultOrg={org} onSelect={handleSelect} onClose={handleClose} groups={orgGroups} />
       <BusSelectPopup orgName={org} buses={busOptions} selectedBusId={selectedBus} onSelectBus={handleBusSelect} />
     </>
   )
