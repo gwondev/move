@@ -150,7 +150,7 @@ function App() {
       const label = (name && name !== '운행 차량')
         ? name
         : Number.isFinite(operatorId)
-          ? `${operatorId + 1}호차`
+          ? `${operatorId}호차`
           : `버스 ${bucket.buses.length + 1}`
 
       const entryId = `${metaId}`
