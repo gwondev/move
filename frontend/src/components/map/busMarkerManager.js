@@ -229,6 +229,8 @@ const normalizeBusItem = (raw) => {
     raw.lng ?? raw.longitude ?? raw.lon ?? raw.long ?? raw?.gps?.lng ?? raw?.gps?.longitude
   )
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null
+  // (0,0)은 운행 종료를 의미하므로 UI에서 보이지 않게 필터링
+  if (lat === 0 && lng === 0) return null
 
   const operatorIdRaw = Number(raw.operatorId ?? raw.operatorID ?? raw.operator_id ?? raw.operator)
   const operatorId = Number.isFinite(operatorIdRaw) ? operatorIdRaw : undefined
